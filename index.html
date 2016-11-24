@@ -1,1 +1,30 @@
-"Hello World" 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TCG</title>
+    <link rel="stylesheet" href="game.css">
+
+</head>
+<!--on drag start and on drop to prevent draggeable dom elements-->
+<body onload="GAME.onLoad()" ondragstart="return false;" ondrop="return false;">
+    <span id="fpsLabel">0 fps</span>
+    <div id="settings">
+        <input id="settingsButton" type="button" onclick="GAME.settingsClick();" value="Settings" />
+        
+        <div id="settingsMenu" style="visibility:hidden;">
+            <!--<input id="resY" type="text" value="720"><input id="resX" type="text" value="1280"><span id="resolution">Resolution:</span>-->
+        </div>
+        
+    </div>
+    
+    
+    <div id="Game Canvas">
+        <canvas id="canvas3d"></canvas>
+    </div>
+    
+    
+    <script src="game.min.js"></script>
+
+    
+</body>
+</html>
