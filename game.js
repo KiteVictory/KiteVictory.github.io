@@ -161,6 +161,327 @@ GAME.getTargetYDistance=function(targetY,camera,normalizeVector)
     var distance = (targetY-camera.position.y)/normalizeVector.y;
     return distance;
 };
+/**
+* Level 1 Game
+*/
+GAME.Level1=function()
+{
+    this.p1=0;
+    this.p2=1;
+    
+    this.players=[];
+    this.globalDeck=null;
+    
+    this.turnState=0;
+    this.currentTurn=0;
+    this.currentPlayerTurn=1;
+    this.startPos={x:0,y:0};
+    this.meshSelected=null;
+};
+
+/**
+* Initialization
+*/
+GAME.Level1.prototype.init=function(){
+    this.createHandlers();
+    
+    this.cam=this.creationHandler.createCamera("cam1");
+    this.cam.rotation.x=Math.PI/2;
+    
+    this.light=this.creationHandler.createLight("light1");
+    
+    this.board=this.creationHandler.createBoard(GAME.CONSTANTS.BOARD_NAME);
+    
+    this.players=this.creationHandler.createPlayers([GAME.CharacterCards.Ji_Ru,
+                                                    GAME.CharacterCards.Script_Kiddie]);
+    var deckSettings=[{//Global Deck
+                            cards:{
+                                Ion_Storm:3,
+                                EMP_Wave:3,
+                                High_Proposition:3,
+                                Good_Day:9,
+                                Stock_Rise:3,
+                                Link_Boost:3,
+                                Market_Crash:3,
+                                Open_Season:3
+                            },
+                            rotations:{
+                                x:Math.PI/2,y:0,z:Math.PI/2
+                            }
+                        },{//P1 Deck
+                            rotations:{
+                                x:Math.PI/2,y:0,z:0
+                            },
+                            owner:this.players[this.p1]
+                        },{//P2 Deck
+                            rotations:{
+                                x:Math.PI/2,y:0,z:0
+                            },
+                            owner:this.players[this.p2]
+                        }
+                    ];
+    
+    this.decks=[this.globalDeck,
+                  this.players[this.p1].deck,
+                  this.players[this.p2].deck];
+    this.creationHandler.createDecks(GAME.CONSTANTS.DECK_OWNERS,
+                                        this.decks,
+                                        deckSettings);
+    for(var i=0;i<this.decks.length;i++)
+    {
+        if(i===0)
+        {
+            this.deckHandler.add(this.decks[i],
+                             deckSettings[i].cards);
+        }
+        else
+        {
+            this.deckHandler.add(this.decks[i],
+                             deckSettings[i].owner.character.deckCards);
+        }
+        
+    }
+    
+    //I need to reassign so that the pass by value gets put back into the correct reference.
+    for(var j=0;j<this.players.length;j++)
+    {
+        this.players[j].deck = this.decks[j+1];
+    }
+    
+    //Piles are just another deck but they initially start empty
+    this.piles=[];
+    var pileSettings=[{//Global Pile
+                    rotations:{
+                        x:Math.PI/2,y:0,z:Math.PI/2
+                    }
+                },
+                {//P1 Pile
+                    rotations:{
+                        x:Math.PI/2,y:0,z:0
+                    }
+                },
+                {//P2 Pile
+                    rotations:{
+                        x:Math.PI/2,y:0,z:0
+                    }
+                }];
+                
+    this.creationHandler.createPiles(GAME.CONSTANTS.PILE_OWNERS,this.piles,pileSettings);
+    this.creationHandler.createHands(this.players);
+    
+    this.start();
+};
+
+/**
+* Create Handlers for this game
+*/
+GAME.Level1.prototype.createHandlers=function()
+{
+    this.gameHandler = new GAME.GameHandler(this);
+    this.creationHandler = new GAME.CreationHandler(this);
+    this.actionHandler = new GAME.ActionHandler(this);
+    this.animationHandler = new GAME.AnimationHandler(this);
+    this.deckHandler=new GAME.DeckHandler(this);
+    this.ruleHandler=new GAME.RuleHandler(this);
+};
+
+/**
+* Start the game loop
+*/
+GAME.Level1.prototype.start=function()
+{
+    GAME.engine3d.scene.registerBeforeRender(this.runBefore);
+    GAME.engine3d.scene.registerAfterRender(this.runAfter);
+};
+
+/**
+* The game run before render loop tied to the scene
+*/
+GAME.Level1.prototype.runBefore=function()
+{
+    if(GAME.debug)
+    {
+        GAME.debuggerSystem.tickFPS();
+    }
+    
+    GAME.levelHandler.currLevel.gameHandler.update();
+    GAME.levelHandler.currLevel.animationHandler.update();
+};
+/**
+* The game run after render loop tied to the scene
+*/
+GAME.Level1.prototype.runAfter=function()
+{
+    GAME.levelHandler.currLevel.gameHandler.updateAfter();
+    /*
+    if(GAME.settingsHandler.updateResolution())
+    {
+        GAME.resizeCanvas();
+    }
+    */
+};
+
+/**
+* This is used to halt the run loop immediately
+*/
+GAME.Level1.prototype.stopRun=function()
+{
+    GAME.engine3d.scene.unregisterBeforeRender(this.runAfter);
+    GAME.engine3d.scene.unregisterAfterRender(this.runBefore);
+};
+/**
+* Level 2 Game
+*/
+GAME.Level2=function()
+{
+    this.p1=0;
+    this.p2=1;
+    
+    this.players=[];
+    this.globalDeck=null;
+    
+    this.turnState=0;
+    this.currentTurn=0;
+    this.currentPlayerTurn=1;
+};
+
+/**
+* Initialization
+*/
+GAME.Level2.prototype.init=function(){
+    this.createHandlers();
+    
+    this.cam=this.creationHandler.createCamera("cam1");
+    this.cam.rotation.x=Math.PI/2;
+    
+    this.light=this.creationHandler.createLight("light1");
+    
+    this.board=this.creationHandler.createBoard("board");
+    
+    this.players=this.creationHandler.createPlayers([GAME.CharacterCards.Ji_Ru,
+                                                    GAME.CharacterCards.Script_Kiddie]);
+    var deckSettings=[{//Global Deck
+                            cards:{
+                                Ion_Storm:3,
+                                EMP_Wave:3,
+                                High_Proposition:3,
+                                Good_Day:9,
+                                Stock_Rise:3,
+                                Link_Boost:3,
+                                Market_Crash:3,
+                                Open_Season:3
+                            },
+                            rotations:{
+                                x:Math.PI/2,y:0,z:Math.PI/2
+                            }
+                        },{//P1 Deck
+                            cards:this.players[this.p1].character.deckCards,
+                            rotations:{
+                                x:Math.PI/2,y:0,z:0
+                            }
+                        },{//P2 Deck
+                            cards:this.players[this.p2].character.deckCards,
+                            rotations:{
+                                x:Math.PI/2,y:0,z:0
+                            }
+                        }
+                    ];
+    
+    this.decks=[this.globalDeck,
+                  this.players[this.p1].deck,
+                  this.players[this.p2].deck];
+    this.creationHandler.createDecks(GAME.CONSTANTS.DECK_OWNERS,
+                                        this.decks,
+                                        deckSettings);
+    for(var i=0;i<this.decks.length;i++)
+    {
+        this.deckHandler.add(this.decks[i],
+                             deckSettings[i].cards);
+    }
+    
+    //I need to reassign so that the pass by value gets put back into the correct reference.
+    for(var j=0;j<this.players.length;j++)
+    {
+        this.players[j].deck = this.decks[j+1];
+    }
+    
+    //Piles are just another deck but they initially start empty
+    this.piles=[];
+    var pileSettings=[{//Global Pile
+                    rotations:{
+                        x:Math.PI/2,y:0,z:Math.PI/2
+                    }
+                },
+                {//P1 Pile
+                    rotations:{
+                        x:Math.PI/2,y:0,z:0
+                    }
+                },
+                {//P2 Pile
+                    rotations:{
+                        x:Math.PI/2,y:0,z:0
+                    }
+                }];
+                
+    this.creationHandler.createPiles(GAME.CONSTANTS.PILE_OWNERS,this.piles,pileSettings);
+    this.creationHandler.createHands(this.players);
+    
+    this.start();
+};
+
+/**
+* Create Handlers for this game
+*/
+GAME.Level2.prototype.createHandlers=function()
+{
+    this.gameHandler = new GAME.GameHandler(this);
+    this.creationHandler = new GAME.CreationHandler(this);
+    this.animationHandler = new GAME.AnimationHandler(this);
+    this.deckHandler=new GAME.DeckHandler(this);
+    this.ruleHandler=new GAME.RuleHandler(this);
+};
+
+/**
+* Start the game loop
+*/
+GAME.Level2.prototype.start=function()
+{
+    GAME.engine3d.scene.registerBeforeRender(this.runBefore);
+    GAME.engine3d.scene.registerAfterRender(this.runAfter);
+};
+
+/**
+* The game run before render loop tied to the scene
+*/
+GAME.Level2.prototype.runBefore=function()
+{
+    if(GAME.debug)
+    {
+        GAME.debuggerSystem.tickFPS();
+    }
+    
+    GAME.levelHandler.currLevel.gameHandler.update();
+    GAME.levelHandler.currLevel.animationHandler.update();
+};
+/**
+* The game run after render loop tied to the scene
+*/
+GAME.Level2.prototype.runAfter=function()
+{
+    if(GAME.settingsHandler.updateResolution())
+    {
+        GAME.resizeCanvas();
+    }
+};
+
+/**
+* This is used to halt the run loop immediately
+*/
+GAME.Level2.prototype.stopRun=function()
+{
+    GAME.engine3d.scene.unregisterBeforeRender(this.runAfter);
+    GAME.engine3d.scene.unregisterAfterRender(this.runBefore);
+};
 GAME.CONSTANTS={
     UNDEFINED:"undefined",
     DEBUG:"debug",
@@ -1732,32 +2053,6 @@ GAME.MessageBox = function(name,scene,val){
     
     return this;
 };
-GAME.Clickable=function(){
-    /**
-    * If an object has this component then it's click, held and release
-    * functions can be redefined to do tasks
-    */
-};
-
-GAME.Clickable.prototype.click=function(){
-    
-};
-
-GAME.Clickable.prototype.held=function(){
-    
-};
-
-GAME.Clickable.prototype.release=function(event){
-    
-};
-
-
-GAME.Command=function(){
-    /**
-    * If an object has this component then it's click, held and release
-    * functions can be redefined to do tasks
-    */
-};
 GAME.Anim=function(obj,duration,settings){
     this.obj=obj;
     this.mesh=obj.mesh;
@@ -2143,6 +2438,32 @@ GAME.Token = function(name,settings){
     
     return this;
 };
+GAME.Clickable=function(){
+    /**
+    * If an object has this component then it's click, held and release
+    * functions can be redefined to do tasks
+    */
+};
+
+GAME.Clickable.prototype.click=function(){
+    
+};
+
+GAME.Clickable.prototype.held=function(){
+    
+};
+
+GAME.Clickable.prototype.release=function(event){
+    
+};
+
+
+GAME.Command=function(){
+    /**
+    * If an object has this component then it's click, held and release
+    * functions can be redefined to do tasks
+    */
+};
 GAME.CameraFactory = function(){
     this.cameras=[];
     this.camerasHash={};
@@ -2374,324 +2695,3 @@ GAME.ParticleBuilder.prototype.get=function(name){
     return this.guiElementsHash[name];
 };
 */
-/**
-* Level 1 Game
-*/
-GAME.Level1=function()
-{
-    this.p1=0;
-    this.p2=1;
-    
-    this.players=[];
-    this.globalDeck=null;
-    
-    this.turnState=0;
-    this.currentTurn=0;
-    this.currentPlayerTurn=1;
-    this.startPos={x:0,y:0};
-    this.meshSelected=null;
-};
-
-/**
-* Initialization
-*/
-GAME.Level1.prototype.init=function(){
-    this.createHandlers();
-    
-    this.cam=this.creationHandler.createCamera("cam1");
-    this.cam.rotation.x=Math.PI/2;
-    
-    this.light=this.creationHandler.createLight("light1");
-    
-    this.board=this.creationHandler.createBoard(GAME.CONSTANTS.BOARD_NAME);
-    
-    this.players=this.creationHandler.createPlayers([GAME.CharacterCards.Ji_Ru,
-                                                    GAME.CharacterCards.Script_Kiddie]);
-    var deckSettings=[{//Global Deck
-                            cards:{
-                                Ion_Storm:3,
-                                EMP_Wave:3,
-                                High_Proposition:3,
-                                Good_Day:9,
-                                Stock_Rise:3,
-                                Link_Boost:3,
-                                Market_Crash:3,
-                                Open_Season:3
-                            },
-                            rotations:{
-                                x:Math.PI/2,y:0,z:Math.PI/2
-                            }
-                        },{//P1 Deck
-                            rotations:{
-                                x:Math.PI/2,y:0,z:0
-                            },
-                            owner:this.players[this.p1]
-                        },{//P2 Deck
-                            rotations:{
-                                x:Math.PI/2,y:0,z:0
-                            },
-                            owner:this.players[this.p2]
-                        }
-                    ];
-    
-    this.decks=[this.globalDeck,
-                  this.players[this.p1].deck,
-                  this.players[this.p2].deck];
-    this.creationHandler.createDecks(GAME.CONSTANTS.DECK_OWNERS,
-                                        this.decks,
-                                        deckSettings);
-    for(var i=0;i<this.decks.length;i++)
-    {
-        if(i===0)
-        {
-            this.deckHandler.add(this.decks[i],
-                             deckSettings[i].cards);
-        }
-        else
-        {
-            this.deckHandler.add(this.decks[i],
-                             deckSettings[i].owner.character.deckCards);
-        }
-        
-    }
-    
-    //I need to reassign so that the pass by value gets put back into the correct reference.
-    for(var j=0;j<this.players.length;j++)
-    {
-        this.players[j].deck = this.decks[j+1];
-    }
-    
-    //Piles are just another deck but they initially start empty
-    this.piles=[];
-    var pileSettings=[{//Global Pile
-                    rotations:{
-                        x:Math.PI/2,y:0,z:Math.PI/2
-                    }
-                },
-                {//P1 Pile
-                    rotations:{
-                        x:Math.PI/2,y:0,z:0
-                    }
-                },
-                {//P2 Pile
-                    rotations:{
-                        x:Math.PI/2,y:0,z:0
-                    }
-                }];
-                
-    this.creationHandler.createPiles(GAME.CONSTANTS.PILE_OWNERS,this.piles,pileSettings);
-    this.creationHandler.createHands(this.players);
-    
-    this.start();
-};
-
-/**
-* Create Handlers for this game
-*/
-GAME.Level1.prototype.createHandlers=function()
-{
-    this.gameHandler = new GAME.GameHandler(this);
-    this.creationHandler = new GAME.CreationHandler(this);
-    this.actionHandler = new GAME.ActionHandler(this);
-    this.animationHandler = new GAME.AnimationHandler(this);
-    this.deckHandler=new GAME.DeckHandler(this);
-    this.ruleHandler=new GAME.RuleHandler(this);
-};
-
-/**
-* Start the game loop
-*/
-GAME.Level1.prototype.start=function()
-{
-    GAME.engine3d.scene.registerBeforeRender(this.runBefore);
-    GAME.engine3d.scene.registerAfterRender(this.runAfter);
-};
-
-/**
-* The game run before render loop tied to the scene
-*/
-GAME.Level1.prototype.runBefore=function()
-{
-    if(GAME.debug)
-    {
-        GAME.debuggerSystem.tickFPS();
-    }
-    
-    GAME.levelHandler.currLevel.gameHandler.update();
-    GAME.levelHandler.currLevel.animationHandler.update();
-};
-/**
-* The game run after render loop tied to the scene
-*/
-GAME.Level1.prototype.runAfter=function()
-{
-    GAME.levelHandler.currLevel.gameHandler.updateAfter();
-    /*
-    if(GAME.settingsHandler.updateResolution())
-    {
-        GAME.resizeCanvas();
-    }
-    */
-};
-
-/**
-* This is used to halt the run loop immediately
-*/
-GAME.Level1.prototype.stopRun=function()
-{
-    GAME.engine3d.scene.unregisterBeforeRender(this.runAfter);
-    GAME.engine3d.scene.unregisterAfterRender(this.runBefore);
-};
-/**
-* Level 2 Game
-*/
-GAME.Level2=function()
-{
-    this.p1=0;
-    this.p2=1;
-    
-    this.players=[];
-    this.globalDeck=null;
-    
-    this.turnState=0;
-    this.currentTurn=0;
-    this.currentPlayerTurn=1;
-};
-
-/**
-* Initialization
-*/
-GAME.Level2.prototype.init=function(){
-    this.createHandlers();
-    
-    this.cam=this.creationHandler.createCamera("cam1");
-    this.cam.rotation.x=Math.PI/2;
-    
-    this.light=this.creationHandler.createLight("light1");
-    
-    this.board=this.creationHandler.createBoard("board");
-    
-    this.players=this.creationHandler.createPlayers([GAME.CharacterCards.Ji_Ru,
-                                                    GAME.CharacterCards.Script_Kiddie]);
-    var deckSettings=[{//Global Deck
-                            cards:{
-                                Ion_Storm:3,
-                                EMP_Wave:3,
-                                High_Proposition:3,
-                                Good_Day:9,
-                                Stock_Rise:3,
-                                Link_Boost:3,
-                                Market_Crash:3,
-                                Open_Season:3
-                            },
-                            rotations:{
-                                x:Math.PI/2,y:0,z:Math.PI/2
-                            }
-                        },{//P1 Deck
-                            cards:this.players[this.p1].character.deckCards,
-                            rotations:{
-                                x:Math.PI/2,y:0,z:0
-                            }
-                        },{//P2 Deck
-                            cards:this.players[this.p2].character.deckCards,
-                            rotations:{
-                                x:Math.PI/2,y:0,z:0
-                            }
-                        }
-                    ];
-    
-    this.decks=[this.globalDeck,
-                  this.players[this.p1].deck,
-                  this.players[this.p2].deck];
-    this.creationHandler.createDecks(GAME.CONSTANTS.DECK_OWNERS,
-                                        this.decks,
-                                        deckSettings);
-    for(var i=0;i<this.decks.length;i++)
-    {
-        this.deckHandler.add(this.decks[i],
-                             deckSettings[i].cards);
-    }
-    
-    //I need to reassign so that the pass by value gets put back into the correct reference.
-    for(var j=0;j<this.players.length;j++)
-    {
-        this.players[j].deck = this.decks[j+1];
-    }
-    
-    //Piles are just another deck but they initially start empty
-    this.piles=[];
-    var pileSettings=[{//Global Pile
-                    rotations:{
-                        x:Math.PI/2,y:0,z:Math.PI/2
-                    }
-                },
-                {//P1 Pile
-                    rotations:{
-                        x:Math.PI/2,y:0,z:0
-                    }
-                },
-                {//P2 Pile
-                    rotations:{
-                        x:Math.PI/2,y:0,z:0
-                    }
-                }];
-                
-    this.creationHandler.createPiles(GAME.CONSTANTS.PILE_OWNERS,this.piles,pileSettings);
-    this.creationHandler.createHands(this.players);
-    
-    this.start();
-};
-
-/**
-* Create Handlers for this game
-*/
-GAME.Level2.prototype.createHandlers=function()
-{
-    this.gameHandler = new GAME.GameHandler(this);
-    this.creationHandler = new GAME.CreationHandler(this);
-    this.animationHandler = new GAME.AnimationHandler(this);
-    this.deckHandler=new GAME.DeckHandler(this);
-    this.ruleHandler=new GAME.RuleHandler(this);
-};
-
-/**
-* Start the game loop
-*/
-GAME.Level2.prototype.start=function()
-{
-    GAME.engine3d.scene.registerBeforeRender(this.runBefore);
-    GAME.engine3d.scene.registerAfterRender(this.runAfter);
-};
-
-/**
-* The game run before render loop tied to the scene
-*/
-GAME.Level2.prototype.runBefore=function()
-{
-    if(GAME.debug)
-    {
-        GAME.debuggerSystem.tickFPS();
-    }
-    
-    GAME.levelHandler.currLevel.gameHandler.update();
-    GAME.levelHandler.currLevel.animationHandler.update();
-};
-/**
-* The game run after render loop tied to the scene
-*/
-GAME.Level2.prototype.runAfter=function()
-{
-    if(GAME.settingsHandler.updateResolution())
-    {
-        GAME.resizeCanvas();
-    }
-};
-
-/**
-* This is used to halt the run loop immediately
-*/
-GAME.Level2.prototype.stopRun=function()
-{
-    GAME.engine3d.scene.unregisterBeforeRender(this.runAfter);
-    GAME.engine3d.scene.unregisterAfterRender(this.runBefore);
-};
