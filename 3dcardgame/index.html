@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>KiteVictory Home</title>
+    <title>TCG</title>
     <link rel="apple-touch-icon" sizes="57x57" href="favicon/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="favicon/apple-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="favicon/apple-icon-72x72.png">
@@ -21,21 +21,31 @@
     <meta name="theme-color" content="#ffffff">
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
      
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="game.css">
 
 </head>
 <!--on drag start and on drop to prevent draggeable dom elements-->
-<body onload="SITE.onLoad()" ondragstart="return false;" ondrop="return false;">
+<body onload="GAME.onLoad()" ondragstart="return false;" ondrop="return false;">
+    <span id="fpsLabel">0 fps</span>
+    <span id="renderWidth">0</span>
+    <span id="renderHeight">0</span>
+    <span id="innerWidth">0</span>
+    <span id="innerHeight">0</span>
     <div id="settings">
         <input id="settingsButton" type="button" onclick="GAME.settingsClick();" value="Settings" />
         
         <div id="settingsMenu" style="visibility:hidden;">
             <!--<input id="resY" type="text" value="720"><input id="resX" type="text" value="1280"><span id="resolution">Resolution:</span>-->
         </div>
+        
     </div>
-    <a href="https://kitevictory.github.io/3dcardgame/index.html">3D CARD GAME</a>
     
-    <script src="index.min.js"></script>
+    
+    <div id="Game Canvas">
+        <canvas id="canvas3d"></canvas>
+    </div>
+    
+    <script src="game.min.js"></script>
 
     
 </body>
